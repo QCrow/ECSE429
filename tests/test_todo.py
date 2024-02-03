@@ -44,3 +44,8 @@ class TestClass:
     def test_head_all_todos(self):
         head_response = requests.head(f"{BASE_URL}/todos")
         assert head_response.status_code == 200
+
+    def test_patch_all_todos(self):
+        patch_response = requests.patch(f"{BASE_URL}/todos")
+        # this should fail as the method is not allowed
+        assert patch_response.status_code == 405
