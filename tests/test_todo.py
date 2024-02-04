@@ -49,3 +49,56 @@ class TestClass:
         patch_response = requests.patch(f"{BASE_URL}/todos")
         # this should fail as the method is not allowed
         assert patch_response.status_code == 405
+
+    def test_get_todo_by_id(self):
+        todo_id = self.test_create_todo()
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}")
+        assert get_response.status_code == 200 and (get_response.json()["todos"][0]["id"]) == todo_id
+
+    def test_update_todo_by_id(self):
+        todo_id = 1
+        todo_data = {
+            "title": "Updated Todo",
+            "doneStatus": True,
+            "description": "Updated test todo",
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
+        assert update_response.status_code == 200 and update_response.json()["id"] == "1"
+
+    def test_create_todo_with_id(self):
+        todo_id = 1
+        todo_data = {
+            "title": "Test Todo",
+            "doneStatus": False,
+            "description": "Simple test todo",
+        }
+
+        create_response = requests.post(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
+        assert create_response.status_code == 200 and create_response.json()["id"] == "1"
+
+    def test_delete_todo_by_id(self):
+        todo_id = 2
+        todo_data = {
+            "title": "Test Todo",
+            "doneStatus": False,
+            "description": "Simple test todo",
+        }
+        requests.post(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+        assert delete_response.status_code == 200
+
+    def test_options_todo_by_id(self):
+        todo_id = 1
+        options_response = requests.options(f"{BASE_URL}/todos/{todo_id}")
+        assert options_response.status_code == 200
+
+    def test_head_todo_by_id(self):
+        todo_id = 1
+        head_response = requests.head(f"{BASE_URL}/todos/{todo_id}")
+        assert head_response.status_code == 200
+
+    def test_patch_todo_by_id(self):
+        todo_id = 1
+        patch_response = requests.patch(f"{BASE_URL}/todos/{todo_id}")
+        # this should fail as the method is not allowed
+        assert patch_response.status_code == 405
