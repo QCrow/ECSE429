@@ -16,7 +16,7 @@ class TestClass:
         todo_id = create_response.json().get("id")
         return todo_id
 
-    def get_all_todos(self):
+    def test_get_all_todos(self):
         get_response = requests.get(f"{BASE_URL}/todos")
         assert get_response.status_code == 200
         return get_response.json()
