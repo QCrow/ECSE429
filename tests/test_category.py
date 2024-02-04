@@ -31,11 +31,11 @@ class TestClass:
 
     def test_method_not_allowed_on_base_endpoint(self):
         """Test methods not allowed on the base /categories endpoint"""
-        #  PUT on categories endpoint is not allowed
+       
         put_response = requests.put(f"{BASE_URL}/categories", json={})
         assert put_response.status_code == 405, "PUT should not be allowed on base /categories"
 
-        # DELETE  on base categories endpoint is not allowed
+      
         delete_response = requests.delete(f"{BASE_URL}/categories")
         assert delete_response.status_code == 405, "DELETE should not be allowed on base /categories"
 
@@ -60,7 +60,7 @@ class TestClass:
         assert patch_response.status_code == 405
 
 
-    "end pint with category_id"
+    "end pint with category_pythonid"
  
     def test_get_specific_category(self):
         category_id = self.test_create_categories()
@@ -69,22 +69,37 @@ class TestClass:
 
     def test_update_or_put_specific_category(self):
         """Test updating a specific category by ID"""
-        category_id = self.test_create_category()
+        category_id = self.test_create_categories()
         updated_category_data = {
             "title": "Updated Category Title",
             "description": "Updated category description"
         }
         update_response = requests.put(f"{BASE_URL}/categories/{category_id}", json=updated_category_data)
-        assert update_response.status_code == 200, "Expected 200 OK for category update"
+        assert update_response.status_code == 200
 
     def test_delete_specific_category(self):
-        """Test deleting a specific category by ID"""
-        category_id = self.test_create_category()
+        category_id = self.test_create_categories()
         delete_response = requests.delete(f"{BASE_URL}/categories/{category_id}")
-        assert delete_response.status_code == 200, "Expected 200 OK for category deletion"
-
+        assert delete_response.status_code == 200
+        
     def test_post_specific_category_not_allowed(self):
         category_id = self.test_create_categories()
         data = {"title": "Attempt to Post", "description": "Post Description"}
         response = requests.post(f"{BASE_URL}/{category_id}", json=data)
+        assert response.status_code == 404
+
+    def test_options_specific_category(self):
+        category_id = self.test_create_categories()
+        response = requests.options(f"{BASE_URL}/{category_id}")
+        assert response.status_code == 200
+
+    def test_head_specific_category(self):
+        category_id = self.test_create_categories()
+        response = requests.head(f"{BASE_URL}/{category_id}")
+        assert response.status_code == 200
+
+    def test_patch_specific_category_not_allowed(self):
+        category_id = self.test_create_categories()
+        data = {"title": "Patch testing", "description": "shoulkd not work"}
+        response = requests.patch(f"{BASE_URL}/{category_id}", json=data)
         assert response.status_code == 405
