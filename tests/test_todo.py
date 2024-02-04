@@ -204,3 +204,124 @@ class TestClass:
         patch_response = requests.patch(f"{BASE_URL}/todos/{todo_id}/tasksof")
         # this should fail as the method is not allowed
         assert patch_response.status_code == 405
+
+    #categories by id
+    def test_get_categories_by_todo_id_and_category_id_expected_behavior(self):
+        todo_id = 1
+        category_id = 1
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert get_response.status_code == 405
+
+    def test_get_categories_by_todo_id_and_category_id_actual_behavior(self):
+        todo_id = 1
+        category_id = 1
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert get_response.status_code == 404
+
+    def test_update_categories_by_todo_id_and_category_id(self):
+        todo_id = 1
+        category_id = 1
+        category_data = {
+            "id": "1",
+            "title": "categories_test",
+            "description": "test of category 1",
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}", json=category_data)
+        assert update_response.status_code == 405
+
+    def test_delete_categories_by_todo_id_and_category_id_expected_behavior(self):
+        todo_id = 1
+        category_id = 1
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert delete_response.status_code == 405
+
+    def test_delete_categories_by_todo_id_and_category_id_actual_behavior(self):
+        todo_id = 1
+        category_id = 1
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert delete_response.status_code == 404
+
+    def test_options_categories_by_todo_id_and_category_id(self):
+        todo_id = 1
+        category_id = 1
+        options_response = requests.options(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert options_response.status_code == 200
+
+    def test_head_categories_by_todo_id_and_category_id_expected_behavior(self):
+        todo_id = 1
+        category_id = 1
+        head_response = requests.head(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert head_response.status_code == 405
+
+    def test_head_categories_by_todo_id_and_category_id_actual_behavior(self):
+        todo_id = 1
+        category_id = 1
+        head_response = requests.head(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert head_response.status_code == 404
+
+    def test_patch_categories_by_todo_id_and_category_id(self):
+        todo_id = 1
+        category_id = 1
+        patch_response = requests.patch(f"{BASE_URL}/todos/{todo_id}/categories/{category_id}")
+        assert patch_response.status_code == 405
+
+    #tasksof by id
+    def test_get_tasksof_by_todo_id_and_tasksof_id_expected_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert get_response.status_code == 405
+
+    def test_get_tasksof_by_todo_id_and_tasksof_id_actual_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert get_response.status_code == 404
+
+    def test_update_tasksof_by_todo_id_and_tasksof_id(self):
+        todo_id = 1
+        tasksof_id = 1
+        tasksof_data = {
+            "id": "1",
+            "title": "tasksof_test",
+            "description": "test of tasksof 1",
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}", json=tasksof_data)
+        assert update_response.status_code == 405
+
+    def test_delete_tasksof_by_todo_id_and_tasksof_id_expected_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert delete_response.status_code == 405
+
+    def test_delete_tasksof_by_todo_id_and_tasksof_id_actual_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert delete_response.status_code == 404
+
+    def test_options_tasksof_by_todo_id_and_tasksof_id(self):
+        todo_id = 1
+        tasksof_id = 1
+        options_response = requests.options(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert options_response.status_code == 200
+
+    def test_head_tasksof_by_todo_id_and_tasksof_id_expected_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        head_response = requests.head(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert head_response.status_code == 405
+
+    def test_head_tasksof_by_todo_id_and_tasksof_id_actual_behavior(self):
+        todo_id = 1
+        tasksof_id = 1
+        head_response = requests.head(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert head_response.status_code == 404
+
+    def test_patch_tasksof_by_todo_id_and_tasksof_id(self):
+        todo_id = 1
+        tasksof_id = 1
+        patch_response = requests.patch(f"{BASE_URL}/todos/{todo_id}/tasksof/{tasksof_id}")
+        assert patch_response.status_code == 405
+    
