@@ -16,6 +16,17 @@ class TestClass:
         todo_id = create_response.json().get("id")
         return todo_id
 
+    def test_create_todo_with_malformed_data(self):
+        todo_data = {
+            "title": "Test Todo",
+            "doneStatus": False,
+            "description": "Simple test todo",
+            "extra": "extra data"
+        }
+
+        create_response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+        assert create_response.status_code == 400
+
     def test_get_all_todos(self):
         get_response = requests.get(f"{BASE_URL}/todos")
         assert get_response.status_code == 200
@@ -86,6 +97,11 @@ class TestClass:
         requests.post(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
         delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
         assert delete_response.status_code == 200
+
+    def test_delete_inexistent_todo_by_id(self):
+        todo_id = 100
+        delete_response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+        assert delete_response.status_code == 404
 
     def test_options_todo_by_id(self):
         todo_id = 1
