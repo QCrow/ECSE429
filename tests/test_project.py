@@ -241,3 +241,28 @@ def test_get_nonexistent_todo_in_project():
     # Assuming 1 is a valid project ID. Replace with a valid one if needed.
     response = requests.get(f"{BASE_URL}/projects/1/tasks/999999")
     assert response.status_code == 404
+
+
+def test_create_project_with_invalid_data():
+    # Attempt to create a project with invalid data (empty title)
+    response = requests.post(f"{BASE_URL}/projects", json={})
+    assert response.status_code == 400
+
+
+#! Wrong error code
+def test_create_invalid_project_todos_relationship_expected():
+    # Assume the project ID 999999 does not exist
+    non_existent_project_id = 999999
+    response = requests.post(
+        f"{BASE_URL}/projects/{non_existent_project_id}/tasks", json={"id": 1}
+    )
+    assert response.status_code == 400
+
+
+def test_create_invalid_project_todos_relationship_actual():
+    # Assume the project ID 999999 does not exist
+    non_existent_project_id = 999999
+    response = requests.post(
+        f"{BASE_URL}/projects/{non_existent_project_id}/tasks", json={"id": 1}
+    )
+    assert response.status_code == 404
