@@ -70,7 +70,7 @@ class TestClass:
  
     def test_get_specific_category(self):
         category_id = self.test_create_categories()
-        response = requests.get(f"{BASE_URL}/{category_id}")
+        response = requests.get(f"{BASE_URL}/categories/{category_id}")
         assert response.status_code == 200
 
     def test_update_or_put_specific_category(self):
@@ -87,26 +87,26 @@ class TestClass:
         delete_response = requests.delete(f"{BASE_URL}/categories/{category_id}")
         assert delete_response.status_code == 200
         
-    def test_post_specific_category_not_allowed(self):
+    def test_post_specific_category(self):
         category_id = self.test_create_categories()
         data = {"title": "Attempt to Post", "description": "Post Description"}
-        response = requests.post(f"{BASE_URL}/{category_id}", json=data)
-        assert response.status_code == 404
+        response = requests.post(f"{BASE_URL}/categories/{category_id}", json=data)
+        assert response.status_code == 200
 
     def test_options_specific_category(self):
         category_id = self.test_create_categories()
-        response = requests.options(f"{BASE_URL}/{category_id}")
+        response = requests.options(f"{BASE_URL}/categories/{category_id}")
         assert response.status_code == 200
 
     def test_head_specific_category(self):
         category_id = self.test_create_categories()
-        response = requests.head(f"{BASE_URL}/{category_id}")
+        response = requests.head(f"{BASE_URL}/categories/{category_id}")
         assert response.status_code == 200
 
     def test_patch_specific_category_not_allowed(self):
         category_id = self.test_create_categories()
         data = {"title": "Patch testing", "description": "shoulkd not work"}
-        response = requests.patch(f"{BASE_URL}/{category_id}", json=data)
+        response = requests.patch(f"{BASE_URL}/categories/{category_id}", json=data)
         assert response.status_code == 405
         
     "test with /categories/:id/projects"
@@ -215,7 +215,7 @@ class TestClass:
         todo_id = self.test_create_todo()
         for method in [requests.get, requests.put, requests.post, requests.patch, requests.head]:
             response = method(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
-            assert response.status_code == 405, f"{method.__name__.upper()} should not be allowed."
+            assert response.status_code == 405
 
     def test_options_for_category_todo_endpoint(self):
         category_id = self.test_create_categories()
