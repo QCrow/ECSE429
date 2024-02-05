@@ -88,7 +88,16 @@ class TestClass:
         assert create_response.status_code == 200 and create_response.json()["id"] == "1"
 
     def test_delete_todo_by_id(self):
-        todo_id = 2
+        todo_data = {
+            "title": "Test Todo",
+            "doneStatus": False,
+            "description": "Simple test todo",
+        }
+
+        create_response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+        assert create_response.status_code == 201
+        todo_id = create_response.json().get("id")
+        
         todo_data = {
             "title": "Test Todo",
             "doneStatus": False,
