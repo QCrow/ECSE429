@@ -103,3 +103,38 @@ class TestClass:
         data = {"title": "Patch testing", "description": "shoulkd not work"}
         response = requests.patch(f"{BASE_URL}/{category_id}", json=data)
         assert response.status_code == 405
+        
+    "test with /categories/:id/projects"
+
+    def test_get_projects_for_category(self):
+        category_id = self.test_create_categories()
+        response = requests.get(f"{BASE_URL}/categories/{category_id}/projects")
+        assert response.status_code == 200
+
+    def test_method_not_allowed_for_end_point_category_projects(self):
+        category_id = self.test_create_categories()
+        
+        # PUT method
+        put_response = requests.put(f"{BASE_URL}/categories/{category_id}/projects")
+        assert put_response.status_code == 405
+
+        #DELETE method
+        delete_response = requests.delete(f"{BASE_URL}/categories/{category_id}/projects")
+        assert delete_response.status_code == 405
+
+        #PATCH method
+        patch_response = requests.patch(f"{BASE_URL}/categories/{category_id}/projects")
+        assert patch_response.status_code == 405
+
+    def test_options_for_category_projects(self):
+
+        category_id = self.test_create_categories()
+        response = requests.options(f"{BASE_URL}/categories/{category_id}/projects")
+        assert response.status_code == 200
+
+    def test_head_for_category_projects(self):
+      
+        category_id = self.test_create_categories()
+        response = requests.head(f"{BASE_URL}/categories/{category_id}/projects")
+        assert response.status_code == 200
+
