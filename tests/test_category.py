@@ -137,4 +137,57 @@ class TestClass:
         category_id = self.test_create_categories()
         response = requests.head(f"{BASE_URL}/categories/{category_id}/projects")
         assert response.status_code == 200
+        
+        "/categories/:id/todos"
+    
+    def test_get_todos_for_category(self):
+        category_id = self.test_create_categories()
+        response = requests.get(f"{BASE_URL}/categories/{category_id}/todos")
+        assert response.status_code == 200
 
+    def test_options_for_category_todos(self):
+        category_id = self.test_create_categories()
+        response = requests.options(f"{BASE_URL}/categories/{category_id}/todos")
+        assert response.status_code == 200
+
+    def test_head_for_category_todos(self):
+        category_id = self.test_create_categories()
+        response = requests.head(f"{BASE_URL}/categories/{category_id}/todos")
+        assert response.status_code == 200
+
+    def test_method_not_allowed(self):
+        category_id = self.test_create_categories()
+        for method in [requests.put, requests.delete, requests.patch]:
+            response = method(f"{BASE_URL}/categories/{category_id}/todos")
+            assert response.status_code == 405
+
+    def test_post_todo_to_category(self):
+        category_id = self.test_create_categories()
+        todo_id = self.test_create_todo()
+        relationship_data = {"id": todo_id}
+        response = requests.post(f"{BASE_URL}/categories/{category_id}/todos", json=relationship_data)
+        assert response.status_code in [201, 400]
+        
+    
+    "/categories/:id/todos/:id"
+
+    def test_method_restrictions_for_category_todo_endpoint(self):
+        category_id = self.test_create_categories()
+        todo_id = self.test_create_todo()
+        for method in [requests.get, requests.put, requests.post, requests.patch, requests.head]:
+            response = method(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
+            assert response.status_code == 405, f"{method.__name__.upper()} should not be allowed."
+
+    def test_options_for_category_todo_endpoint(self):
+        category_id = self.test_create_categories()
+        todo_id = self.test_create_todo()
+        response = requests.options(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
+        assert response.status_code == 200
+
+    def test_delete_category_todo_relationship(self):
+        """Test deleting the relationship between a category and a todo."""
+        category_id = self.test_create_categories()
+        todo_id = self.test_create_todo()
+
+        response = requests.delete(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
+        assert response.status_code in [200, 400, 404]
