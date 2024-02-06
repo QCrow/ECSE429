@@ -33,7 +33,6 @@ class TestClass:
         return get_response.json()
 
     def test_update_all_todos(self):
-        todo_id = self.test_create_todo()
         todo_data = {
             "title": "Updated Todo",
             "doneStatus": True,
@@ -41,6 +40,16 @@ class TestClass:
         }
         update_response = requests.put(f"{BASE_URL}/todos", json=todo_data)
         # this should fail as the method is not allowed
+        assert update_response.status_code == 405
+
+    def test_update_all_todos_with_malformed_data(self):
+        todo_data = {
+            "title": "Updated Todo",
+            "doneStatus": True,
+            "description": "Updated test todo",
+            "extra": "extra data"
+        }
+        update_response = requests.put(f"{BASE_URL}/todos", json=todo_data)
         assert update_response.status_code == 405
 
     def test_delete_all_todos(self):
@@ -75,6 +84,27 @@ class TestClass:
         }
         update_response = requests.put(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
         assert update_response.status_code == 200 and update_response.json()["id"] == "1"
+
+    def test_update_inexistent_todo_by_id(self):
+        todo_id = 100
+        todo_data = {
+            "title": "Updated Todo",
+            "doneStatus": True,
+            "description": "Updated test todo",
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
+        assert update_response.status_code == 404
+
+    def test_update_todo_by_id_with_malformed_data(self):
+        todo_id = 1
+        todo_data = {
+            "title": "Updated Todo",
+            "doneStatus": True,
+            "description": "Updated test todo",
+            "extra": "extra data"
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}", json=todo_data)
+        assert update_response.status_code == 400
 
     def test_create_todo_with_id(self):
         todo_id = 1
@@ -144,6 +174,17 @@ class TestClass:
         create_response = requests.post(f"{BASE_URL}/todos/{todo_id}/categories", json=category_data)
         assert create_response.status_code == 201
 
+    def test_create_categories_by_todo_id_with_malformed_data(self):
+        todo_id = 1
+        category_data = {
+            "id": "1",
+            "title": "categories_test",
+            "description": "test of category 1",
+            "extra": "extra data"
+        }
+        create_response = requests.post(f"{BASE_URL}/todos/{todo_id}/categories", json=category_data)
+        assert create_response.status_code == 400
+
     def test_update_categories_by_todo_id(self):
         todo_id = 1
         category_id = 1
@@ -154,6 +195,18 @@ class TestClass:
         }
         update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/categories", json=category_data)
         # this should fail as the method is not allowed
+        assert update_response.status_code == 405
+
+    def test_update_categories_by_todo_id_with_malformed_data(self):
+        todo_id = 1
+        category_id = 1
+        category_data = {
+            "id": "1",
+            "title": "categories_test",
+            "description": "test of category 1",
+            "extra": "extra data"
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/categories", json=category_data)
         assert update_response.status_code == 405
 
     def test_delete_categories_by_todo_id(self):
@@ -194,6 +247,17 @@ class TestClass:
         }
         create_response = requests.post(f"{BASE_URL}/todos/{todo_id}/tasksof", json=tasksof_data)
         assert create_response.status_code == 201
+    
+    def test_create_tasksof_by_todo_id_with_malformed_data(self):
+        todo_id = 1
+        tasksof_data = {
+            "id": "1",
+            "title": "tasksof_test",
+            "description": "test of tasksof 1",
+            "extra": "extra data"
+        }
+        create_response = requests.post(f"{BASE_URL}/todos/{todo_id}/tasksof", json=tasksof_data)
+        assert create_response.status_code == 400
 
     def test_update_tasksof_by_todo_id(self):
         todo_id = 1
@@ -205,6 +269,18 @@ class TestClass:
         }
         update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/tasksof", json=tasksof_data)
         # this should fail as the method is not allowed
+        assert update_response.status_code == 405
+
+    def test_update_tasksof_by_todo_id_with_malformed_data(self):   
+        todo_id = 1
+        tasksof_id = 1
+        tasksof_data = {
+            "id": "1",
+            "title": "tasksof_test",
+            "description": "test of tasksof 1",
+            "extra": "extra data"
+        }
+        update_response = requests.put(f"{BASE_URL}/todos/{todo_id}/tasksof", json=tasksof_data)
         assert update_response.status_code == 405
 
     def test_delete_tasksof_by_todo_id(self):
