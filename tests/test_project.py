@@ -7,6 +7,12 @@ def test_create_project():
     response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
     assert response.status_code == 201
     assert response.json()["title"] == "Test Project"
+    assert response.json()["description"] == ""
+    assert response.json()["completed"] == "false"
+    assert response.json()["active"] == "false"
+
+    response = requests.delete(f"{BASE_URL}/projects/{response.json()['id']}")
+    assert response.status_code == 200
 
 
 def test_get_all_projects():
@@ -31,22 +37,109 @@ def test_amend_project_with_post():
     response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
     assert response.status_code == 201
     project_id = response.json()["id"]
+
+    todo_data = {
+        "title": "Test Todo",
+        "doneStatus": False,
+        "description": "Simple test todo",
+    }
+
+    response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+    assert response.status_code == 201
+    todo_id = response.json().get("id")
+
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
+    assert response.status_code == 201
+
     response = requests.post(
         f"{BASE_URL}/projects/{project_id}", json={"title": "Amended Project"}
     )
     assert response.status_code == 200
     assert response.json()["title"] == "Amended Project"
+    assert response.json()["description"] == ""
+    assert response.json()["completed"] == "false"
+    assert response.json()["active"] == "false"
+    assert response.json()["tasks"][0]["id"] == todo_id
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+    assert response.status_code == 200
 
 
-def test_amend_project_with_put():
+def test_amend_project_with_put_expected():
     response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
     assert response.status_code == 201
     project_id = response.json()["id"]
+
+    todo_data = {
+        "title": "Test Todo",
+        "doneStatus": False,
+        "description": "Simple test todo",
+    }
+
+    response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+    assert response.status_code == 201
+    todo_id = response.json().get("id")
+
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
+    assert response.status_code == 201
+
     response = requests.put(
         f"{BASE_URL}/projects/{project_id}", json={"title": "Amended Project"}
     )
     assert response.status_code == 200
     assert response.json()["title"] == "Amended Project"
+    assert response.json()["description"] == ""
+    assert response.json()["completed"] == "false"
+    assert response.json()["active"] == "false"
+    assert response.json()["tasks"][0]["id"] == todo_id
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+    assert response.status_code == 200
+
+
+def test_amend_project_with_put_actual():
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
+    todo_data = {
+        "title": "Test Todo",
+        "doneStatus": False,
+        "description": "Simple test todo",
+    }
+
+    response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+    assert response.status_code == 201
+    todo_id = response.json().get("id")
+
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
+    assert response.status_code == 201
+
+    response = requests.put(
+        f"{BASE_URL}/projects/{project_id}", json={"title": "Amended Project"}
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "Amended Project"
+    assert response.json()["description"] == ""
+    assert response.json()["completed"] == "false"
+    assert response.json()["active"] == "false"
+
+    assert "tasks" not in response.json()
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+    assert response.status_code == 200
 
 
 def test_get_project_by_id():
@@ -56,6 +149,11 @@ def test_get_project_by_id():
     response = requests.get(f"{BASE_URL}/projects/{project_id}")
     assert response.status_code == 200
     assert response.json()["projects"][0]["title"] == "Test Project"
+
+
+def test_get_project_invalid_id():
+    response = requests.get(f"{BASE_URL}/projects/invalid_id")
+    assert response.status_code == 404
 
 
 def test_get_project_header_by_id():
@@ -77,6 +175,18 @@ def test_delete_project_by_id():
     assert response.status_code == 404
 
 
+def test_double_delete_project_by_id():
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 404
+
+
 def test_get_project_id_endpoint_options():
     response = requests.options(f"{BASE_URL}/projects/1")
     assert response.status_code == 200
@@ -90,19 +200,70 @@ def test_create_project_todos_relationship():
         "description": "Simple test todo",
     }
 
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
     create_response = requests.post(f"{BASE_URL}/todos", json=todo_data)
     assert create_response.status_code == 201
     todo_id = create_response.json().get("id")
 
-    response = requests.post(f"{BASE_URL}/projects/{1}/tasks", json={"id": todo_id})
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
     assert response.status_code == 201
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}/tasks/{todo_id}")
+    assert response.status_code == 200
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+    assert response.status_code == 200
 
 
 def test_get_project_todos_relationship():
-    response = requests.get(f"{BASE_URL}/projects/{1}/tasks")
+    todo_data = {
+        "title": "Test Todo",
+        "doneStatus": False,
+        "description": "Simple test todo",
+    }
+
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
+    create_response = requests.post(f"{BASE_URL}/todos", json=todo_data)
+    assert create_response.status_code == 201
+    todo_id = create_response.json().get("id")
+
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
+    assert response.status_code == 201
+
+    response = requests.get(f"{BASE_URL}/projects/{project_id}/tasks")
     print(response.json())
     assert response.status_code == 200
     assert isinstance(response.json()["todos"], list)
+    assert response.json()["todos"][0]["id"] == todo_id
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}/tasks/{todo_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/todos/{todo_id}")
+    assert response.status_code == 200
+
+
+def test_get_project_todos_relationship_invalid_id_expected():
+    response = requests.get(f"{BASE_URL}/projects/invalid_id/tasks")
+    assert response.status_code == 404
+
+
+def test_get_project_todos_relationship_invalid_id_actual():
+    response = requests.get(f"{BASE_URL}/projects/invalid_id/tasks")
+    assert response.status_code == 200
 
 
 def test_get_project_todos_relationship_headers():
@@ -128,12 +289,23 @@ def test_delete_project_todos_relationship():
     assert create_response.status_code == 201
     todo_id = create_response.json().get("id")
 
-    response = requests.post(f"{BASE_URL}/projects/{1}/tasks", json={"id": todo_id})
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
     assert response.status_code == 201
-    response = requests.delete(f"{BASE_URL}/projects/{1}/tasks/{todo_id}")
+    project_id = response.json()["id"]
+
+    response = requests.post(
+        f"{BASE_URL}/projects/{project_id}/tasks", json={"id": todo_id}
+    )
+    assert response.status_code == 201
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}/tasks/{todo_id}")
     assert response.status_code == 200
-    response = requests.get(f"{BASE_URL}/projects/{1}/tasks")
+    response = requests.get(f"{BASE_URL}/projects/{project_id}/tasks")
     assert todo_id not in [todo["id"] for todo in response.json()["todos"]]
+
+
+def test_delete_project_todos_relationship_invalid_id():
+    response = requests.delete(f"{BASE_URL}/projects/1/tasks/invalid_id")
+    assert response.status_code == 404
 
 
 def test_options_on_project_todos_relationship():
@@ -152,10 +324,23 @@ def test_create_project_catergories_relationship():
     assert create_response.status_code == 201
     category_id = create_response.json().get("id")
 
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
     response = requests.post(
-        f"{BASE_URL}/projects/{1}/categories", json={"id": category_id}
+        f"{BASE_URL}/projects/{project_id}/categories", json={"id": category_id}
     )
     assert response.status_code == 201
+
+    response = requests.delete(
+        f"{BASE_URL}/projects/{project_id}/categories/{category_id}"
+    )
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/categories/{category_id}")
+    assert response.status_code == 200
 
 
 def test_get_project_categories_relationship():
@@ -186,16 +371,26 @@ def test_delete_project_categories_relationship():
     assert create_response.status_code == 201
     category_id = create_response.json().get("id")
 
+    response = requests.post(f"{BASE_URL}/projects", json={"title": "Test Project"})
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
     response = requests.post(
-        f"{BASE_URL}/projects/{1}/categories", json={"id": category_id}
+        f"{BASE_URL}/projects/{project_id}/categories", json={"id": category_id}
     )
     assert response.status_code == 201
-    response = requests.delete(f"{BASE_URL}/projects/{1}/categories/{category_id}")
+    response = requests.delete(
+        f"{BASE_URL}/projects/{project_id}/categories/{category_id}"
+    )
     assert response.status_code == 200
-    response = requests.get(f"{BASE_URL}/projects/{1}/categories")
+    response = requests.get(f"{BASE_URL}/projects/{project_id}/categories")
     assert category_id not in [
         category["id"] for category in response.json()["categories"]
     ]
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
+    response = requests.delete(f"{BASE_URL}/categories/{category_id}")
+    assert response.status_code == 200
 
 
 def test_options_on_project_categories_id_relationship():
@@ -220,7 +415,6 @@ def test_patch_on_specific_project():
 
 
 def test_get_nonexistent_project():
-    # Using a very high ID number to ensure the project does not exist
     response = requests.get(f"{BASE_URL}/projects/999999")
     assert response.status_code == 404
 
@@ -238,20 +432,20 @@ def test_delete_nonexistent_project():
 
 
 def test_get_nonexistent_todo_in_project():
-    # Assuming 1 is a valid project ID. Replace with a valid one if needed.
     response = requests.get(f"{BASE_URL}/projects/1/tasks/999999")
     assert response.status_code == 404
 
 
-def test_create_project_with_invalid_data():
-    # Attempt to create a project with invalid data (empty title)
+def test_create_project_with_empty_data():
     response = requests.post(f"{BASE_URL}/projects", json={})
-    assert response.status_code == 400
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+
+    response = requests.delete(f"{BASE_URL}/projects/{project_id}")
+    assert response.status_code == 200
 
 
-#! Wrong error code
 def test_create_invalid_project_todos_relationship_expected():
-    # Assume the project ID 999999 does not exist
     non_existent_project_id = 999999
     response = requests.post(
         f"{BASE_URL}/projects/{non_existent_project_id}/tasks", json={"id": 1}
@@ -260,9 +454,28 @@ def test_create_invalid_project_todos_relationship_expected():
 
 
 def test_create_invalid_project_todos_relationship_actual():
-    # Assume the project ID 999999 does not exist
     non_existent_project_id = 999999
     response = requests.post(
         f"{BASE_URL}/projects/{non_existent_project_id}/tasks", json={"id": 1}
     )
+    assert response.status_code == 404
+
+
+def test_not_implemented_get_project_todos_id_expected():
+    response = requests.get(f"{BASE_URL}/projects/1/tasks/1")
+    assert response.status_code == 405
+
+
+def test_not_implemented_get_project_todos_id_actual():
+    response = requests.get(f"{BASE_URL}/projects/1/tasks/1")
+    assert response.status_code == 404
+
+
+def test_not_implemented_post_project_todos_id_expected():
+    response = requests.post(f"{BASE_URL}/projects/1/tasks/1")
+    assert response.status_code == 405
+
+
+def test_not_implemented_post_project_todos_id_actual():
+    response = requests.post(f"{BASE_URL}/projects/1/tasks/1")
     assert response.status_code == 404
