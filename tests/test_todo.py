@@ -75,6 +75,11 @@ class TestClass:
         get_response = requests.get(f"{BASE_URL}/todos/{todo_id}")
         assert get_response.status_code == 200 and (get_response.json()["todos"][0]["id"]) == todo_id
 
+    def test_get_inexistent_todo_by_id(self):
+        todo_id = 100
+        get_response = requests.get(f"{BASE_URL}/todos/{todo_id}")
+        assert get_response.status_code == 404
+
     def test_update_todo_by_id(self):
         todo_id = 1
         todo_data = {
