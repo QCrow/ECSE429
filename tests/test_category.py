@@ -105,6 +105,7 @@ class TestClass:
         data = {"title": "Attempt to Post", "description": "Post Description"}
         response = requests.post(f"{BASE_URL}/categories/{category_id}", json=data)
         assert response.status_code == 200
+        
 
     def test_options_specific_category(self):
         category_id = self.test_create_categories()
@@ -179,7 +180,14 @@ class TestClass:
     def test_method_restrictions_for_category_project_endpoint(self):
         category_id = self.test_create_categories()
         project_id = self.test_create_project()
-        for method in [requests.get, requests.put, requests.post, requests.patch, requests.head]:
+        for method in [ requests.patch,requests.put, ]:
+            response = method(f"{BASE_URL}/categories/{category_id}/projects/{project_id}")
+            assert response.status_code == 405
+        
+    def test_method_restrictions_for_category_project_endpoint2(self):
+        category_id = self.test_create_categories()
+        project_id = self.test_create_project()
+        for method in [requests.get,   requests.head,  requests.post,]:
             response = method(f"{BASE_URL}/categories/{category_id}/projects/{project_id}")
             assert response.status_code == 405
 
@@ -233,7 +241,14 @@ class TestClass:
     def test_method_restrictions_for_category_todo_endpoint(self):
         category_id = self.test_create_categories()
         todo_id = self.test_create_todo()
-        for method in [requests.get, requests.put, requests.post, requests.patch, requests.head]:
+        for method in [requests.put, requests.patch]:
+            response = method(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
+            assert response.status_code == 405
+            
+    def test_method_restrictions_for_category_todo_endpoin2t(self):
+        category_id = self.test_create_categories()
+        todo_id = self.test_create_todo()
+        for method in [  requests.post, requests.head, requests.get]:
             response = method(f"{BASE_URL}/categories/{category_id}/todos/{todo_id}")
             assert response.status_code == 405
 
