@@ -36,7 +36,7 @@ It's recommended to use a virtual environment to manage dependencies for your pr
 3. **Installing Dependencies**
 
    ```bash
-   pip install requests pytest
+   pip install requests pytest pytest-random-order
    ```
 
 4. **Writing Tests**
@@ -48,5 +48,5 @@ It's recommended to use a virtual environment to manage dependencies for your pr
    To run all tests, use pytest command in the root directory of the project.
 
    ```bash
-   pytest
+   pytest --random-order
    ```
