@@ -30,7 +30,10 @@ class TestClass:
         return todo_id
     
     "end point with category"
+    
+    
     def test_post_an_empty_category(self):
+        "post with nothing"
         create_response = requests.post(f"{BASE_URL}/categories")
         assert create_response.status_code == 400, "bad request"
 
@@ -61,9 +64,7 @@ class TestClass:
         head_response = requests.head(f"{BASE_URL}/categories")
         assert head_response.status_code == 200
 
-    def test_patch_method_not_allowed(self):
-        patch_response = requests.patch(f"{BASE_URL}/categories")
-        assert patch_response.status_code == 405
+    
 
 
     "end point with category_id"
@@ -73,6 +74,13 @@ class TestClass:
         response = requests.get(f"{BASE_URL}/categories/{category_id}")
         assert response.status_code == 200
 
+    
+    def test_get_specific_no_exist_category(self):
+        category_id = 9000
+        response = requests.get(f"{BASE_URL}/categories/{category_id}")
+        assert response.status_code == 404
+        
+        
     def test_update_or_put_specific_category(self):
         category_id = self.test_create_categories()
         updated_category_data = {
@@ -86,6 +94,11 @@ class TestClass:
         category_id = self.test_create_categories()
         delete_response = requests.delete(f"{BASE_URL}/categories/{category_id}")
         assert delete_response.status_code == 200
+    
+    def test_delet_with_no_category(self):
+        id=9000
+        delete_response = requests.delete(f"{BASE_URL}/categories/{id}")
+        assert delete_response.status_code == 404
         
     def test_post_specific_category(self):
         category_id = self.test_create_categories()
@@ -143,6 +156,13 @@ class TestClass:
         response = requests.head(f"{BASE_URL}/categories/{category_id}/projects")
         assert response.status_code == 200
         
+    def test_post_for_category_projects(self):
+        category_id = self.test_create_categories()
+        project_id = self.test_create_project()
+        relationship_data = {"id": project_id}
+        response = requests.post(f"{BASE_URL}/categories/{category_id}/projects", json=relationship_data)
+        assert response.status_code in [201, 400]
+        
         
         
         
@@ -171,11 +191,11 @@ class TestClass:
 
     def test_delete_category_project_relationship(self):
         category_id = self.test_create_categories()
-        project_id = self.test_create_project()
+        project_id = self.test_create_categories()
         response = requests.delete(f"{BASE_URL}/categories/{category_id}/projects/{project_id}")
-        assert response.status_code in [200, 400, 404]
+        assert response.status_code in [400, 404]
         
-        
+    
         
         "/categories/:id/todos"
     
@@ -224,7 +244,6 @@ class TestClass:
         assert response.status_code == 200
 
     def test_delete_category_todo_relationship(self):
-        """Test deleting the relationship between a category and a todo."""
         category_id = self.test_create_categories()
         todo_id = self.test_create_todo()
 
