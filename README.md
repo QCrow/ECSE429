@@ -34,10 +34,14 @@ It's recommended to use a virtual environment to manage dependencies for your pr
      ```
 
 3. **Installing Dependencies**
+   Install the required libraries using pip:
+
+   pip install requests pytest pytest-random-order psutil
 
    ```bash
-   pip install requests pytest pytest-random-order
+   pip install requests pytest pytest-random-order psutil
    ```
+   This will install requests for making HTTP requests, pytest for running tests, pytest-random-order to randomize the order of test execution, and psutil for accessing system details like CPU usage and memory.
 
 4. **Writing Tests**
    Tests are located in `./tests` folder.
